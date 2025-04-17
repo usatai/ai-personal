@@ -15,7 +15,7 @@ const Signup = () => {
 
     const handleSubmit = async (e : React.FormEvent) => {
         e.preventDefault();
-
+        
         console.log(userForm);
         
         try{

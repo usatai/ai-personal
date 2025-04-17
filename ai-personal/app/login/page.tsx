@@ -24,6 +24,8 @@ const Login = () => {
                 })
             });
 
+            console.log(loginForm);
+
             const data = await response.json();
 
             if(response.ok){
@@ -47,10 +49,26 @@ const Login = () => {
 
             <form onSubmit={getLoginSubmit} className="bg-gray-200 bg-opacity-90 p-8 rounded-lg shadow-lg w-full max-w-md">
                 <label className="block mb-4">
-                    <input type="text" name="username" placeholder='ユーザー名' required className="mt-1 block w-full border border-gray-600 rounded p-2 bg-white" />
+                    <input 
+                        type="text" 
+                        name="username" 
+                        placeholder='ユーザー名' 
+                        required 
+                        className="mt-1 block w-full border border-gray-600 rounded p-2 bg-white" 
+                        value={loginForm.user_name}
+                        onChange={(e) => setLoginForm({...loginForm, user_name: e.target.value})}
+                    />
                 </label>
                 <label className="block mb-4">
-                    <input type="password" name="password" placeholder='パスワード' required className="mt-8 block w-full border border-gray-600 rounded p-2 bg-white" />
+                    <input 
+                        type="password" 
+                        name="password" 
+                        placeholder='パスワード' 
+                        required 
+                        className="mt-8 block w-full border border-gray-600 rounded p-2 bg-white" 
+                        value={loginForm.user_password}
+                        onChange={(e) => setLoginForm({...loginForm, user_password: e.target.value})}
+                    />
                 </label>
                 <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded-lg w-full hover:bg-blue-500 transition duration-300 mt-5">ログイン</button>
                 <button onClick={() => window.location.href = '/'} type="button" className="bg-gray-600 text-white py-2 px-4 rounded-lg w-full hover:bg-gray-500 transition duration-300 mt-5">戻る</button>
