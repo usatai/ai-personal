@@ -19,8 +19,8 @@ const Login = () => {
                 credentials : 'include',
                 headers : {'Content-Type' : 'application/json'},
                 body : JSON.stringify({
-                    user_name : loginForm.user_name,
-                    user_password : loginForm.user_password,
+                    userName : loginForm.user_name,
+                    userPassword : loginForm.user_password,
                 })
             });
 
