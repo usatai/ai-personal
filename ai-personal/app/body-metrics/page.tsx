@@ -42,7 +42,21 @@ const BodyMetrics = () => {
         console.log(data.message);
 
         if(response.ok){
-            router.push("/main");
+            // POSTが成功した場合、GETリクエストを送信
+            const getResponse = await fetch("http://localhost:8080/api/bodydata/userinfo", {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (getResponse.ok) {
+                const userInfo = await getResponse.json();
+                console.log(userInfo);
+                // 必要に応じて状態を更新
+                // setUserInfo(userInfo); // 例: ユーザー情報を状態に保存
+            } else {
+                console.error("ユーザー情報の取得に失敗しました");
+            }
         }else{
             if(data.errors){
                 setError(data.errors);

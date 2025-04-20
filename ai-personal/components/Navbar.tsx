@@ -7,7 +7,7 @@ export default function Navbar() {
   return (
     <nav className="bg-blue-300 text-white p-4 fixed top-0 left-0 w-full shadow-md z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <a href="#" className="text-2xl font-bold">🏃 AI Persomal</a>
+        <a href="#" className="text-2xl font-bold">🏃 AI Personal</a>
         
         {/* Desktop Menu */}
         <ul className="hidden md:flex space-x-6">
