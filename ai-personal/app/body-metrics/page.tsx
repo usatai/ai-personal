@@ -1,159 +1,133 @@
 'use client'
 
-import { useState , useEffect} from 'react';
+import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import { useRouter } from 'next/navigation';
 
 const BodyMetrics = () => {
-    const [bodyData,setBodyData] = useState({
-        height : '', // 身長
-        weight : '', // 体重
-        fat : '', // 体脂肪率
-        goalWeight : '', // 目標体重
-        goalFat : '', // 目標体脂肪
-        goalType : '', // 目標タイプ
-        tagetPeriod : '', // 目標期間
-    });
+  const [bodyData, setBodyData] = useState({
+    height: '',
+    weight: '',
+    fat: '',
+    goalWeight: '',
+    goalFat: '',
+    goalType: '',
+    tagetPeriod: '',
+  });
 
-    const [errors,setError] = useState(null);
-    const router = useRouter();
+  const [errors, setError] = useState<any>(null);
+  const router = useRouter();
 
-  const handleSubmit = async (event : React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     try {
-        const response = await fetch("http://localhost:8080/api/bodydata/input",{
-            method : 'POST',
-            credentials : 'include',
-            headers : {'Content-Type' : 'application/json'},
-            body : JSON.stringify({
-                user_height : bodyData.height,
-                user_weight : bodyData.weight,
-                user_fat : bodyData.fat,
-                user_goal_weight : bodyData.goalWeight,
-                user_goal_fat : bodyData.goalFat,
-                user_goal_Type : bodyData.goalType,
-                user_target_period : bodyData.tagetPeriod,
-            })            
+      const response = await fetch("http://localhost:8080/api/bodydata/input", {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_height: bodyData.height,
+          user_weight: bodyData.weight,
+          user_fat: bodyData.fat,
+          user_goal_weight: bodyData.goalWeight,
+          user_goal_fat: bodyData.goalFat,
+          user_goal_Type: bodyData.goalType,
+          user_target_period: bodyData.tagetPeriod,
+        })
+      });
+
+      const data = await response.json();
+      console.log(data.message);
+
+      if (response.ok) {
+        const getResponse = await fetch("http://localhost:8080/api/bodydata/userinfo", {
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' }
         });
 
-        const data = await response.json();
-
-        console.log(data.message);
-
-        if(response.ok){
-            // POSTが成功した場合、GETリクエストを送信
-            const getResponse = await fetch("http://localhost:8080/api/bodydata/userinfo", {
-                method: 'GET',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            if (getResponse.ok) {
-                const userInfo = await getResponse.json();
-                console.log(userInfo);
-                // 必要に応じて状態を更新
-                // setUserInfo(userInfo); // 例: ユーザー情報を状態に保存
-            } else {
-                console.error("ユーザー情報の取得に失敗しました");
-            }
-        }else{
-            if(data.errors){
-                setError(data.errors);
-            }
+        if (getResponse.ok) {
+          const userInfo = await getResponse.json();
+          console.log(userInfo);
+        } else {
+          console.error("ユーザー情報の取得に失敗しました");
         }
+      } else {
+        if (data.errors) {
+          setError(data.errors);
+        }
+      }
 
-    }catch(e : any){
-        console.log(e.message);
-        setError(e.message);
+    } catch (e: any) {
+      console.log(e.message);
+      setError(e.message);
     }
-    
+
     console.log(bodyData);
-    // ここでAIからの応答を処理するロジックを追加
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 bg-blue-400 min-h-screen">
-
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-6">
       <Navbar />
 
-      <h1 className="text-4xl font-extrabold text-blue-900 mb-4 text-center pt-20">データ入力画面</h1>
-      <p className="text-lg text-white mb-6 text-center">まずは目標達成のためのデータを入力してください。<br />AIが目標に沿ったプランニングをしてくれます。</p>
-      <form onSubmit={handleSubmit} className="bg-gray-200 bg-opacity-90 p-8 rounded-lg shadow-lg w-full max-w-md">
-        <label className="block mb-4">
-          <input
-            type="number"
-            placeholder="身長 (cm)"
-            value={bodyData.height}
-            onChange={(e) => setBodyData({...bodyData,height: e.target.value})}
+      <h1 className="text-4xl font-bold text-center mt-20 mb-2">データ入力画面</h1>
+      <p className="text-gray-300 mb-8 text-center">目標達成のためのデータを入力してください。<br />AIがプランニングをサポートします。</p>
+
+      <form onSubmit={handleSubmit} className="bg-slate-800 p-8 rounded-xl shadow-xl w-full max-w-md">
+        {[
+          { key: 'height', label: '身長 (cm)' },
+          { key: 'weight', label: '体重 (kg)' },
+          { key: 'fat', label: '体脂肪率 (%)' },
+          { key: 'goalWeight', label: '目標体重 (kg)' },
+          { key: 'goalFat', label: '目標体脂肪 (%)' },
+        ].map(({ key, label }) => (
+          <div key={key} className="mb-4">
+            <input
+              type="number"
+              placeholder={label}
+              required
+              value={(bodyData as any)[key]}
+              onChange={(e) => setBodyData({ ...bodyData, [key]: e.target.value })}
+              className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        ))}
+
+        <div className="mb-4">
+          <select
+            className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={bodyData.goalType}
+            onChange={(e) => setBodyData({ ...bodyData, goalType: e.target.value })}
             required
-            className="mt-1 block w-full border border-gray-600 rounded p-2 bg-white"
-          />
-        </label>
-        <label className="block mb-4">
-          <input
-            type="number"
-            placeholder="体重 (kg)"
-            value={bodyData.weight}
-            onChange={(e) => setBodyData({...bodyData,weight: e.target.value})}
-            required
-            className="mt-1 block w-full border border-gray-600 rounded p-2 bg-white"
-          />
-        </label>
-        <label className="block mb-4">
-          <input
-            type="number"
-            placeholder="体脂肪率 (%)"
-            value={bodyData.fat}
-            onChange={(e) => setBodyData({...bodyData,fat: e.target.value})}
-            required
-            className="mt-1 block w-full border border-gray-600 rounded p-2 bg-white"
-          />
-        </label>
-        <label className="block mb-4">
-          <input
-            type="number"
-            placeholder="目標体重 (kg)"
-            value={bodyData.goalWeight}
-            onChange={(e) => setBodyData({...bodyData,goalWeight: e.target.value})}
-            required
-            className="mt-1 block w-full border border-gray-600 rounded p-2 bg-white"
-          />
-        </label>
-        <label className="block mb-4">
-          <input
-            type="number"
-            placeholder="目標体脂肪 (%)"
-            value={bodyData.goalFat}
-            onChange={(e) => setBodyData({...bodyData,goalFat: e.target.value})}
-            required
-            className="mt-1 block w-full border border-gray-600 rounded p-2 bg-white"
-          />
-        </label>
-        <label className="block mb-4">
-          <select 
-                className="mt-1 block w-full border border-gray-600 rounded p-2 bg-white"
-                onChange={(e) => setBodyData({...bodyData,goalType:e.target.value})}
-                value={bodyData.goalType}
-            >
-            <option value="" disabled>選択してください</option>
+          >
+            <option value="" disabled>目標タイプを選択</option>
             <option value="筋肥大">筋肥大</option>
             <option value="減量">減量</option>
             <option value="健康">健康</option>
           </select>
-        </label>
-        <label className="block mb-4">
+        </div>
+
+        <div className="mb-6">
           <input
             type="text"
             placeholder="目標期間 (例: 3ヶ月)"
             value={bodyData.tagetPeriod}
-            onChange={(e) => setBodyData({...bodyData,tagetPeriod: e.target.value})}
+            onChange={(e) => setBodyData({ ...bodyData, tagetPeriod: e.target.value })}
             required
-            className="mt-1 block w-full border border-gray-600 rounded p-2 bg-white"
+            className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-        </label>
-        <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded-lg w-full hover:bg-blue-500 transition duration-300 mt-5">登録</button>
-        <button onClick={() => window.location.href = '/main'} type="button" className="bg-gray-600 text-white py-2 px-4 rounded-lg w-full hover:bg-gray-500 transition duration-300 mt-5">戻る</button>
+        </div>
+
+        {errors && <p className="text-red-400 text-sm mb-4 text-center">{errors}</p>}
+
+        <button type="submit" className="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold transition">
+          登録
+        </button>
+
+        <button type="button" onClick={() => router.push('/main')} className="w-full py-3 mt-4 bg-slate-600 hover:bg-slate-500 rounded-lg font-semibold transition">
+          戻る
+        </button>
       </form>
     </div>
   );

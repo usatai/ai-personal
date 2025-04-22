@@ -1,37 +1,74 @@
 'use client'
 
 import Navbar from "@/components/Navbar";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const page = () => {
+const ProgressInput = () => {
 
-    return (
-        <div className="flex flex-col items-center justify-center p-4 bg-blue-400 min-h-screen">
+    const [progressData,setProgressData] = useState({progress_weight:'',progress_fat:''});
+    const router = useRouter();
 
-            <Navbar />
-            <h1 className="text-3xl font-extrabold text-blue-900 mb-4 text-center">進捗データ入力</h1>
-            <form className="bg-gray-200 bg-opacity-90 p-8 rounded-lg shadow-lg w-full max-w-md mt-5">
-                <label className="block mb-4">
-                    <input
-                        type="number"
-                        placeholder="体重 (kg)"
-                        required
-                        className="mt-1 block w-full border border-gray-600 rounded p-2 bg-white"
-                    />
-                </label>
-                <label className="block mb-4">
-                    <input
-                        type="number"
-                        placeholder="体脂肪率 (%)"
-                        required
-                        className="mt-1 block w-full border border-gray-600 rounded p-2 bg-white"
-                    />
-                </label>
-                <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded-lg w-full hover:bg-blue-500 transition duration-300 mt-5">登録</button>
-                <button type="button" onClick={() => window.location.href = '/main'} className="bg-gray-600 text-white py-2 px-4 rounded-lg w-full hover:bg-gray-500 transition duration-300 mt-5">戻る</button>
-            </form>
+    const submitProgressData = async (e: React.FormEvent) => {
+        const response = await fetch("http://localhost:8080/api/bodydata/progress",{
+            method : 'POST',
+            credentials : 'include',
+            headers : {'Content-Type':'application/json'},
+            body : JSON.stringify({
+                progress_weight: progressData.progress_weight,
+                progress_fat: progressData.progress_fat,
+            })
+        })
+
+        if(response.ok) {
+            router.push("/main");
+        }
+
+    }
+
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-6">
+      <Navbar />
+
+      <h1 className="text-3xl font-bold text-center mt-20 mb-6 drop-shadow">進捗データ入力</h1>
+
+      <form onSubmit={submitProgressData} className="bg-slate-800 p-8 rounded-xl shadow-xl w-full max-w-md">
+        <div className="mb-6">
+          <input
+            type="number"
+            placeholder="体重 (kg)"
+            required
+            className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
-    );
-}
 
-export default page;
+        <div className="mb-6">
+          <input
+            type="number"
+            placeholder="体脂肪率 (%)"
+            required
+            className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold transition"
+        >
+          登録
+        </button>
+
+        <button
+          type="button"
+          onClick={() => window.location.href = '/main'}
+          className="w-full py-3 mt-4 bg-slate-600 hover:bg-slate-500 rounded-lg font-semibold transition"
+        >
+          戻る
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default ProgressInput;
