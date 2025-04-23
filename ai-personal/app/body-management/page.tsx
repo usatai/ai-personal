@@ -5,18 +5,19 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const ProgressInput = () => {
-
-    const [progressData,setProgressData] = useState({progress_weight:'',progress_fat:''});
+    const [progressData,setProgressData] = useState({progressWeight:'',progressFat:''});
     const router = useRouter();
 
     const submitProgressData = async (e: React.FormEvent) => {
+        e.preventDefault();
+
         const response = await fetch("http://localhost:8080/api/bodydata/progress",{
             method : 'POST',
             credentials : 'include',
             headers : {'Content-Type':'application/json'},
             body : JSON.stringify({
-                progress_weight: progressData.progress_weight,
-                progress_fat: progressData.progress_fat,
+                progressWeight: progressData.progressWeight,
+                progressFat: progressData.progressFat,
             })
         })
 
@@ -40,6 +41,7 @@ const ProgressInput = () => {
             placeholder="体重 (kg)"
             required
             className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setProgressData({...progressData, progressWeight: e.target.value})}
           />
         </div>
 
@@ -49,6 +51,7 @@ const ProgressInput = () => {
             placeholder="体脂肪率 (%)"
             required
             className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setProgressData({...progressData, progressFat: e.target.value})}
           />
         </div>
 
