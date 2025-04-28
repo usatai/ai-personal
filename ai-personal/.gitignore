@@ -43,4 +43,7 @@ next-env.d.ts
 # VS Code
 .vscode/
 
+.DS_Store
+
+
 launch.json
