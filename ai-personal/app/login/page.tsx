@@ -25,21 +25,10 @@ const Login = () => {
 
       const data = await response.json();
 
-      console.log(data.userId);
-
       if (response.ok) {
-        const getResponse = await fetch(`http://localhost:8080/api/bodydata/userinfo?userId=${data.userId}`,{
-            method : "GET",
-            credentials : "include",
-            headers : {'Content-Type' : 'application/json'}
-        });
-
-        const userInfo = await getResponse.json();
-        console.log(userInfo);
-        if (getResponse.ok) {
-            localStorage.setItem("userInfo",JSON.stringify(userInfo));
-            router.push("/main");
-        }
+        localStorage.setItem("userId",data.userId);
+        localStorage.setItem("createdAt",data.createdAt);
+        router.push("/main");
       } else {
         if (data.errors) {
           setError(data.errors);
