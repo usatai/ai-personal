@@ -31,11 +31,10 @@ const Signup = () => {
       const data = await response.json();
 
       if (response.ok) {
+        localStorage.setItem("userId",data.userId);
         router.push("/body-metrics");
       } else {
-        if (data.errors) {
           setError(data.errors);
-        }
       }
 
     } catch (e: any) {

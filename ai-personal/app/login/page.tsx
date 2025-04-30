@@ -30,9 +30,7 @@ const Login = () => {
         localStorage.setItem("createdAt",data.createdAt);
         router.push("/main");
       } else {
-        if (data.errors) {
-          setError(data.errors);
-        }
+        setError(data.errors);
       }
 
     } catch (e: any) {
@@ -47,12 +45,14 @@ const Login = () => {
       <p className="text-gray-300 mb-8 text-center">あなたのアカウントにアクセスしましょう。</p>
 
       <form onSubmit={getLoginSubmit} className="bg-slate-800 p-8 rounded-xl shadow-xl w-full max-w-md">
+
+      {error && <p className="text-red-400 text-sm mb-4 text-center">{error}</p>}
+
         <div className="mb-6">
           <input
             type="text"
             name="username"
             placeholder="ユーザー名"
-            required
             className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={loginForm.user_name}
             onChange={(e) => setLoginForm({ ...loginForm, user_name: e.target.value })}
@@ -64,14 +64,11 @@ const Login = () => {
             type="password"
             name="password"
             placeholder="パスワード"
-            required
             className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={loginForm.user_password}
             onChange={(e) => setLoginForm({ ...loginForm, user_password: e.target.value })}
           />
         </div>
-
-        {error && <p className="text-red-400 text-sm mb-4 text-center">{error}</p>}
 
         <button type="submit" className="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold transition">
           ログイン

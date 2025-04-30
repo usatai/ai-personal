@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react';
+import { format } from 'date-fns';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Navbar from '@/components/Navbar';
 
@@ -49,13 +50,41 @@ export default function Main() {
                 credentials : "include",
                 headers : {'Content-Type' : 'application/json'}
             });
-            const userInfo = await getResponse.json();
-                if (getResponse.ok) {
-                    setUserInfo(userInfo.todayMonth);            
-                }
+            if (getResponse.ok) {
+                const userInfo = await getResponse.json();
+
+                const formatted = userInfo.todayMonth.map((entry: any) => ({
+                    ...entry,
+                    name: format(new Date(entry.name), 'MM/dd')  // ← ここで日付を整形
+                  }));
+
+                setUserInfo(formatted);            
+            }
         };
         fetchTodayMonthData();
     },[])
+
+    // 月選択時のデータ取得
+    useEffect(() => {
+        const fetchMonthData = async () => {
+        if (!selectedMonth) return;
+        const userId = localStorage.getItem("userId");
+        if (!userId) return;
+
+        const [year, month] = selectedMonth.split("-");
+        const getResponse = await fetch(`http://localhost:8080/api/bodydata/userinfo?userId=${userId}&year=${year}&month=${month}`, {
+            method: "GET",
+            credentials: "include",
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (getResponse.ok) {
+            const data = await getResponse.json();
+            setUserInfo(data.todayMonth);
+        }
+        };
+        fetchMonthData();
+    }, [selectedMonth]);
 
     const handleChange = (e : React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedMonth(e.target.value);
@@ -65,7 +94,7 @@ export default function Main() {
     <div className="min-h-screen bg-slate-900 text-white p-6">
       <Navbar />
 
-      <h1 className="text-3xl font-bold text-center mt-20 mb-6 drop-shadow">AI Personal ダッシュボード</h1>
+      <h1 className="text-2xl font-bold text-center mt-20 mb-6 drop-shadow">AI Personal ダッシュボード</h1>
 
       <div className="flex flex-col items-center mb-10">
         <select 

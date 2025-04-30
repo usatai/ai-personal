@@ -12,6 +12,7 @@ const BodyMetrics = () => {
     goalWeight: '',
     goalFat: '',
     goalType: '',
+    sportType: '',
     tagetPeriod: '',
   });
 
@@ -33,15 +34,19 @@ const BodyMetrics = () => {
           user_goal_weight: bodyData.goalWeight,
           user_goal_fat: bodyData.goalFat,
           user_goal_Type: bodyData.goalType,
+          user_sport_Type: bodyData.sportType,
           user_target_period: bodyData.tagetPeriod,
         })
       });
 
       const data = await response.json();
-      console.log(data.message);
+    //   const aiAdvice = data.aiAdvice;
+    //   localStorage.setItem("aiAdvice",aiAdvice);
+    //   console.log(aiAdvice);
 
       if (response.ok) {
-        const getResponse = await fetch("http://localhost:8080/api/bodydata/userinfo", {
+        const userId = localStorage.getItem("userId");
+        const getResponse = await fetch(`http://localhost:8080/api/bodydata/userinfo?${userId}`, {
           method: 'GET',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' }
@@ -50,6 +55,7 @@ const BodyMetrics = () => {
         if (getResponse.ok) {
           const userInfo = await getResponse.json();
           console.log(userInfo);
+          router.push("/main");
         } else {
           console.error("ユーザー情報の取得に失敗しました");
         }
@@ -105,6 +111,19 @@ const BodyMetrics = () => {
             <option value="筋肥大">筋肥大</option>
             <option value="減量">減量</option>
             <option value="健康">健康</option>
+          </select>
+        </div>
+
+        <div className="mb-4">
+          <select
+            className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={bodyData.sportType}
+            onChange={(e) => setBodyData({ ...bodyData, goalType: e.target.value })}
+            required
+          >
+            <option value="" disabled>運動タイプを選択</option>
+            <option value="ジム">ジム</option>
+            <option value="自宅">自宅</option>
           </select>
         </div>
 
