@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 const Login = () => {
   const [loginForm, setLoginForm] = useState({ user_name: '', user_password: '' });
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{[key: string]: string}>({});
 
   const getLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,13 +24,14 @@ const Login = () => {
       });
 
       const data = await response.json();
+      console.log(data); // ← ここで構造確認
 
       if (response.ok) {
         localStorage.setItem("userId",data.userId);
         localStorage.setItem("createdAt",data.createdAt);
         router.push("/main");
       } else {
-        setError(data.errors);
+        setError(data);
       }
 
     } catch (e: any) {
@@ -46,9 +47,8 @@ const Login = () => {
 
       <form onSubmit={getLoginSubmit} className="bg-slate-800 p-8 rounded-xl shadow-xl w-full max-w-md">
 
-      {error && <p className="text-red-400 text-sm mb-4 text-center">{error}</p>}
-
         <div className="mb-6">
+        {error.userName && <p className="text-red-400 text-sm mb-4 text-center">{error.userName}</p>}
           <input
             type="text"
             name="username"
@@ -60,6 +60,7 @@ const Login = () => {
         </div>
 
         <div className="mb-6">
+        {error.userPassword && <p className="text-red-400 text-sm mb-4 text-center">{error.userPassword}</p>}
           <input
             type="password"
             name="password"
@@ -81,7 +82,7 @@ const Login = () => {
 
       <p className="text-center mt-6 text-gray-400">
         パスワードをお忘れの方は{" "}
-        <Link href="/signup" className="text-blue-400 hover:underline">こちら</Link>
+        <Link href="/password" className="text-blue-400 hover:underline">こちら</Link>
       </p>
     </div>
   );

@@ -7,7 +7,7 @@ import Link from "next/link";
 const Signup = () => {
   const [userForm, setUserForm] = useState({ user_name: '', user_email: '', user_password: '' });
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{[key: string]: string}>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserForm({ ...userForm, [e.target.name]: e.target.value });
@@ -34,12 +34,12 @@ const Signup = () => {
         localStorage.setItem("userId",data.userId);
         router.push("/body-metrics");
       } else {
-          setError(data.errors);
+        setError(data);
       }
 
     } catch (e: any) {
       console.error(e.message);
-      setError(e.message);
+      setError({general : "サーバーエラー発生"});
     }
   }
 
@@ -50,6 +50,11 @@ const Signup = () => {
 
       <form onSubmit={handleSubmit} className="bg-slate-800 p-8 rounded-xl shadow-xl w-full max-w-md">
         <div className="mb-6">
+        {error.userName && (
+        <p className="text-red-400 text-sm mb-4 text-center">
+            {error.userName}
+        </p>
+        )}
           <input
             type="text"
             name="user_name"
@@ -61,6 +66,11 @@ const Signup = () => {
         </div>
 
         <div className="mb-6">
+        {error.userEmail && (
+        <p className="text-red-400 text-sm mb-4 text-center">
+            {error.userEmail}
+        </p>
+        )}
           <input
             type="email"
             name="user_email"
@@ -72,6 +82,11 @@ const Signup = () => {
         </div>
 
         <div className="mb-6">
+        {error.userPassword && (
+        <p className="text-red-400 text-sm mb-4 text-center">
+            {error.userPassword}
+        </p>
+        )}
           <input
             type="password"
             name="user_password"
@@ -82,7 +97,6 @@ const Signup = () => {
           />
         </div>
 
-        {error && <p className="text-red-400 text-sm mb-4 text-center">{error}</p>}
 
         <button type="submit" className="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold transition">
           登録
