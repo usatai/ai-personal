@@ -11,7 +11,10 @@ interface YearMonth {
   }
 
 export default function Main() {
-    const [userInfo,setUserInfo] = useState<any>();
+    const [userInfo,setUserInfo] = useState<{
+        todayMonth: number[];
+        aiAdvice: string;
+    } | null>(null);
     const [selectOptions, setSelectOptions] = useState<YearMonth[]>([]);
     const [selectedMonth,setSelectedMonth] = useState<string>("");
 
@@ -53,12 +56,17 @@ export default function Main() {
             if (getResponse.ok) {
                 const userInfo = await getResponse.json();
 
+                console.log(userInfo);
+
                 const formatted = userInfo.todayMonth.map((entry: any) => ({
                     ...entry,
                     name: format(new Date(entry.name), 'MM/dd')  // ← ここで日付を整形
                   }));
 
-                setUserInfo(formatted);            
+                setUserInfo({
+                    todayMonth: formatted,
+                    aiAdvice :userInfo.aiAdvice,
+                });          
             }
         };
         fetchTodayMonthData();
@@ -114,13 +122,18 @@ export default function Main() {
       <section className="bg-slate-800 p-6 rounded-xl shadow-lg mb-10">
         <h2 className="text-xl font-semibold text-center mb-2">食事 & トレーニング概要</h2>
         <p className="text-gray-300 text-center">ここに目標達成までの食事内容とトレーニングの詳細を表示します。</p>
+        <div className="max-w-2xl mx-auto px-4 text-left">
+        {userInfo?.aiAdvice.split('\n').map((line, index) => (
+            <p key={index} className="mb-1">{line}</p>
+        ))}
+        </div>
       </section>
 
       <section className="bg-slate-800 p-6 rounded-xl shadow-lg mb-10">
         <h2 className="text-xl font-semibold text-center mb-4">体重・体脂肪の推移</h2>
         <div className="w-full h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={userInfo}>
+            <LineChart data={userInfo?.todayMonth}>
               <CartesianGrid strokeDasharray="3 3" stroke="#444" />
               <XAxis dataKey="name" stroke="#ccc" />
               <YAxis stroke="#ccc" />
@@ -137,7 +150,7 @@ export default function Main() {
         <h2 className="text-xl font-semibold text-center mb-4">摂取カロリーの推移</h2>
         <div className="w-full h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={userInfo}>
+            <LineChart data={userInfo?.todayMonth}>
               <CartesianGrid strokeDasharray="3 3" stroke="#444" />
               <XAxis dataKey="name" stroke="#ccc" />
               <YAxis stroke="#ccc" />

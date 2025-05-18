@@ -40,13 +40,12 @@ const BodyMetrics = () => {
       });
 
       const data = await response.json();
-    //   const aiAdvice = data.aiAdvice;
-    //   localStorage.setItem("aiAdvice",aiAdvice);
-    //   console.log(aiAdvice);
+      const aiAdvice = data.aiAdvice;
+      localStorage.setItem("aiAdvice",aiAdvice);
 
       if (response.ok) {
         const userId = localStorage.getItem("userId");
-        const getResponse = await fetch(`http://localhost:8080/api/bodydata/userinfo?${userId}`, {
+        const getResponse = await fetch(`http://localhost:8080/api/bodydata/userinfo=${userId}`, {
           method: 'GET',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' }
@@ -118,7 +117,7 @@ const BodyMetrics = () => {
           <select
             className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={bodyData.sportType}
-            onChange={(e) => setBodyData({ ...bodyData, goalType: e.target.value })}
+            onChange={(e) => setBodyData({ ...bodyData, sportType: e.target.value })}
             required
           >
             <option value="" disabled>運動タイプを選択</option>
