@@ -45,7 +45,7 @@ const BodyMetrics = () => {
 
       if (response.ok) {
         const userId = localStorage.getItem("userId");
-        const getResponse = await fetch(`http://localhost:8080/api/bodydata/userinfo=${userId}`, {
+        const getResponse = await fetch(`http://localhost:8080/api/bodydata/userinfo?userId=${userId}`, {
           method: 'GET',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' }
