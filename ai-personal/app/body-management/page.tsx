@@ -52,7 +52,7 @@ const ProgressInput = () => {
         </p>
         )}
           <input
-            type="number"
+            type="text"
             placeholder="体重 (kg)"
             className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             onChange={(e) => setProgressData({...progressData, progressWeight: e.target.value})}
@@ -66,7 +66,7 @@ const ProgressInput = () => {
         </p>
         )}
           <input
-            type="number"
+            type="text"
             placeholder="体脂肪率 (%)"
             className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             onChange={(e) => setProgressData({...progressData, progressFat: e.target.value})}

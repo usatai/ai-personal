@@ -89,7 +89,7 @@ const BodyMetrics = () => {
         ].map(({ key, label }) => (
           <div key={key} className="mb-4">
             <input
-              type="number"
+              type="text"
               placeholder={label}
               required
               value={(bodyData as any)[key]}
