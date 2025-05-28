@@ -14,12 +14,17 @@ interface Food {
   servingSizeUnit?: string;
 }
 
+interface SelectedFood extends Food {
+    quantity: number;
+    unit: "g" | "個";
+}
+
 export default function FoodTracker() {
   const [mealType, setMealType] = useState("breakfast");
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Food[]>([]);
   const [translatedNames, setTranslatedNames] = useState<Record<number, string>>({});
-  const [selectedFoods, setSelectedFoods] = useState<Food[]>([]);
+  const [selectedFoods, setSelectedFoods] = useState<SelectedFood[]>([]);
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [units, setUnits] = useState<Record<number, "g" | "個">>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -34,6 +39,19 @@ export default function FoodTracker() {
         const data : Food[] = await response.json();
         console.log(data);
         setSearchResults(data);
+    }
+
+    const addFood = (food: Food) => {
+        const selectedQuantity = quantities[food.id];
+        const selectedUnit = units[food.id] || "g";
+
+        const newSelectedFood: SelectedFood = {
+            ...food, // 元の Food オブジェクトのプロパティを全てコピー
+            quantity: selectedQuantity, // 入力された数量を追加
+            unit: selectedUnit,         // 選択された単位を追加
+        };
+
+        setSelectedFoods(prev => [...prev, newSelectedFood]);
     }
 
     const saveCalories = async () => {
@@ -153,6 +171,7 @@ export default function FoodTracker() {
                       </select>
                       <span className="text-sm">{totalCalories.toFixed(1)} kcal</span>
                       <button
+                        onClick={() => addFood(food)}
                         className="px-3 py-1 bg-green-500 hover:bg-green-400 rounded text-sm font-semibold"
                       >
                         追加
@@ -175,8 +194,8 @@ export default function FoodTracker() {
               <ul className="text-sm space-y-2">
                 {selectedFoods.map((food, index) => (
                   <li key={index}>
-                    {translatedNames[food.id] || food.foodName}
-                    （{food.servingSize}{food.servingSizeUnit}）
+                    {food.foodName}
+                    ({food.quantity}{food.unit})
                     :<span className="mr-2">{food.calories?.toFixed(1) || 0} kcal</span>
                     <span className="mr-1">P: {food.protein?.toFixed(1) || 0}</span>
                     <span className="mr-1">F:{food.fat?.toFixed(1) || 0} </span>
@@ -188,7 +207,7 @@ export default function FoodTracker() {
           </div>
           <h3 className="text-xl font-bold mt-6 text-center">
             合計カロリー: <span className="text-blue-400"></span> kcal
-            <p>P: <span className="text-blue-400"></span></p>
+            <p>P: <span className="text-blue-400">{}</span></p>
             <p>F: <span className="text-blue-400"></span></p>
             <p>C: <span className="text-blue-400"></span></p>
 
