@@ -28,9 +28,11 @@ export default function FoodTracker() {
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [units, setUnits] = useState<Record<number, "g" | "個">>({});
   const [isSaving, setIsSaving] = useState(false);
+  const [searchMessage, setSearchMessage] = useState<string>("");
 
     const searchFood = async () => {
         console.log(query);
+        setSearchMessage("検索中...");
 
         const response = await fetch(`http://localhost:8080/api/fooddata/foodlist?query=${query}`,{
             method : "GET",
@@ -39,6 +41,7 @@ export default function FoodTracker() {
         const data : Food[] = await response.json();
         console.log(data);
         setSearchResults(data);
+        setSearchMessage(data.length > 0 ? `${data.length}件の食品が見つかりました` : "該当する食品が見つかりませんでした");
     }
 
     const addFood = (food: Food) => {
@@ -46,12 +49,13 @@ export default function FoodTracker() {
         const selectedUnit = units[food.id] || "g";
 
         const newSelectedFood: SelectedFood = {
-            ...food, // 元の Food オブジェクトのプロパティを全てコピー
-            quantity: selectedQuantity, // 入力された数量を追加
-            unit: selectedUnit,         // 選択された単位を追加
+            ...food,
+            quantity: selectedQuantity,
+            unit: selectedUnit,
         };
 
         setSelectedFoods(prev => [...prev, newSelectedFood]);
+        setSearchMessage(`${food.foodName}を追加しました`);
     }
 
     const saveCalories = async () => {
@@ -62,17 +66,23 @@ export default function FoodTracker() {
                 credentials: 'include',
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({
-                mealType,
-                foods: selectedFoods.map(food => ({
-                    description: food.foodName,
-                    calories: food.calories || 0,
-                    protein: food.protein || 0,
-                    fat: food.fat || 0,
-                    carbohydrates: food.carbohydrates || 0
-                }))
+                    mealType,
+                    foods: selectedFoods.map(food => {
+                        const multiplier = food.unit === "g" 
+                            ? (food.quantity / (food.servingSize || 100)) 
+                            : food.quantity;
+                        
+                        return {
+                            description: food.foodName,
+                            calories: (food.calories || 0) * multiplier,
+                            protein: (food.protein || 0) * multiplier,
+                            fat: (food.fat || 0) * multiplier,
+                            carbohydrates: (food.carbohydrates || 0) * multiplier
+                        };
+                    })
                 })
-            
             });
+            
             if (response.ok) {
                 alert("データを保存しました！");
                 setSelectedFoods([]);
@@ -83,7 +93,7 @@ export default function FoodTracker() {
             alert("エラーが発生しました。");
             console.error(error);
         }
-            setIsSaving(false);
+        setIsSaving(false);
     };
 
   return (
@@ -121,6 +131,9 @@ export default function FoodTracker() {
             >
               検索
             </button>
+            {searchMessage && (
+              <p className="mt-2 text-sm text-blue-400">{searchMessage}</p>
+            )}
           </div>
 
           <div className="mt-6">
@@ -192,25 +205,47 @@ export default function FoodTracker() {
               <p className="text-gray-400 text-sm">ここに追加された食品が表示されます。</p>
             ) : (
               <ul className="text-sm space-y-2">
-                {selectedFoods.map((food, index) => (
-                  <li key={index}>
-                    {food.foodName}
-                    ({food.quantity}{food.unit})
-                    :<span className="mr-2">{food.calories?.toFixed(1) || 0} kcal</span>
-                    <span className="mr-1">P: {food.protein?.toFixed(1) || 0}</span>
-                    <span className="mr-1">F:{food.fat?.toFixed(1) || 0} </span>
-                    C:{food.carbohydrates?.toFixed(1) || 0} 
-                  </li>
-                ))}
+                {selectedFoods.map((food, index) => {
+                  const multiplier = food.unit === "g" ? (food.quantity / (food.servingSize || 100)) : food.quantity;
+                  return (
+                    <li key={index}>
+                      {food.foodName}
+                      ({food.quantity}{food.unit})
+                      :<span className="mr-2">{((food.calories || 0) * multiplier).toFixed(1)} kcal</span>
+                      <span className="mr-1">P: {((food.protein || 0) * multiplier).toFixed(1)}</span>
+                      <span className="mr-1">F:{((food.fat || 0) * multiplier).toFixed(1)} </span>
+                      C:{((food.carbohydrates || 0) * multiplier).toFixed(1)} 
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
           <h3 className="text-xl font-bold mt-6 text-center">
-            合計カロリー: <span className="text-blue-400"></span> kcal
-            <p>P: <span className="text-blue-400">{}</span></p>
-            <p>F: <span className="text-blue-400"></span></p>
-            <p>C: <span className="text-blue-400"></span></p>
-
+            合計カロリー: <span className="text-blue-400">
+              {selectedFoods.reduce((total, food) => {
+                const multiplier = food.unit === "g" ? (food.quantity / (food.servingSize || 100)) : food.quantity;
+                return total + (food.calories * multiplier);
+              }, 0).toFixed(1)}
+            </span> kcal
+            <p>P: <span className="text-blue-400">
+              {selectedFoods.reduce((total, food) => {
+                const multiplier = food.unit === "g" ? (food.quantity / (food.servingSize || 100)) : food.quantity;
+                return total + (food.protein * multiplier);
+              }, 0).toFixed(1)}
+            </span>g</p>
+            <p>F: <span className="text-blue-400">
+              {selectedFoods.reduce((total, food) => {
+                const multiplier = food.unit === "g" ? (food.quantity / (food.servingSize || 100)) : food.quantity;
+                return total + (food.fat * multiplier);
+              }, 0).toFixed(1)}
+            </span>g</p>
+            <p>C: <span className="text-blue-400">
+              {selectedFoods.reduce((total, food) => {
+                const multiplier = food.unit === "g" ? (food.quantity / (food.servingSize || 100)) : food.quantity;
+                return total + (food.carbohydrates * multiplier);
+              }, 0).toFixed(1)}
+            </span>g</p>
           </h3>
 
           {selectedFoods.length > 0 && (

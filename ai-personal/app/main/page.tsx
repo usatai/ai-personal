@@ -88,7 +88,10 @@ export default function Main() {
 
         if (getResponse.ok) {
             const data = await getResponse.json();
-            setUserInfo(data.todayMonth);
+            setUserInfo({
+                todayMonth: data.todayMonth,
+                aiAdvice :data.aiAdvice,
+            });
         }
         };
         fetchMonthData();
