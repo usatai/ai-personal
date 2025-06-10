@@ -6,17 +6,17 @@ import { useRouter } from 'next/navigation';
 
 const BodyMetrics = () => {
   const [bodyData, setBodyData] = useState({
-    height: '',
-    weight: '',
-    fat: '',
-    goalWeight: '',
-    goalFat: '',
-    goalType: '',
-    sportType: '',
-    tagetPeriod: '',
+    user_height: '',
+    user_weight: '',
+    user_fat: '',
+    user_goal_weight: '',
+    user_goal_fat: '',
+    user_goal_type: '',
+    user_sport_type: '',
+    user_taget_period: '',
   });
 
-  const [errors, setError] = useState<any>(null);
+  const [error, setError] = useState<{[key: string]: string}>({});
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -28,15 +28,15 @@ const BodyMetrics = () => {
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_height: bodyData.height,
-          user_weight: bodyData.weight,
-          user_fat: bodyData.fat,
-          user_goal_weight: bodyData.goalWeight,
-          user_goal_fat: bodyData.goalFat,
-          user_goal_Type: bodyData.goalType,
-          user_sport_Type: bodyData.sportType,
-          user_target_period: bodyData.tagetPeriod,
-        })
+            user_height: bodyData.user_height === '' ? null : parseFloat(bodyData.user_height), // 空ならnull、そうでなければ数値に変換
+            user_weight: bodyData.user_weight === '' ? null : parseFloat(bodyData.user_weight),
+            user_fat: bodyData.user_fat === '' ? null : parseFloat(bodyData.user_fat),
+            user_goal_weight: bodyData.user_goal_weight === '' ? null : parseFloat(bodyData.user_goal_weight),
+            user_goal_fat: bodyData.user_goal_fat === '' ? null : parseFloat(bodyData.user_goal_fat),
+            user_goal_type: bodyData.user_goal_type === '' ? null : bodyData.user_goal_type, // これは既に修正済み
+            user_sport_type: bodyData.user_sport_type === '' ? null : bodyData.user_sport_type, // これは既に修正済み
+            user_target_period: bodyData.user_taget_period === '' ? null : bodyData.user_taget_period, // String型も空ならnullに
+          })
       });
 
       const data = await response.json();
@@ -59,13 +59,11 @@ const BodyMetrics = () => {
           console.error("ユーザー情報の取得に失敗しました");
         }
       } else {
-        if (data.errors) {
-          setError(data.errors);
-        }
+          setError(data);
+          console.log(data); 
       }
 
     } catch (e: any) {
-      console.log(e.message);
       setError(e.message);
     }
 
@@ -81,17 +79,21 @@ const BodyMetrics = () => {
 
       <form onSubmit={handleSubmit} className="bg-slate-800 p-8 rounded-xl shadow-xl w-full max-w-md">
         {[
-          { key: 'height', label: '身長 (cm)' },
-          { key: 'weight', label: '体重 (kg)' },
-          { key: 'fat', label: '体脂肪率 (%)' },
-          { key: 'goalWeight', label: '目標体重 (kg)' },
-          { key: 'goalFat', label: '目標体脂肪 (%)' },
+          { key: 'user_height', label: '身長 (cm)' },
+          { key: 'user_weight', label: '体重 (kg)' },
+          { key: 'user_fat', label: '体脂肪率 (%)' },
+          { key: 'user_goal_weight', label: '目標体重 (kg)' },
+          { key: 'user_goal_fat', label: '目標体脂肪 (%)' },
         ].map(({ key, label }) => (
           <div key={key} className="mb-4">
+            {error[key] && (
+            <p className="text-red-400 text-sm mb-4 text-center">
+                {error[key]}
+            </p>
+            )}
             <input
               type="text"
               placeholder={label}
-              required
               value={(bodyData as any)[key]}
               onChange={(e) => setBodyData({ ...bodyData, [key]: e.target.value })}
               className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -100,11 +102,15 @@ const BodyMetrics = () => {
         ))}
 
         <div className="mb-4">
+            {error.user_goal_type && (
+                <p className="text-red-400 text-sm mb-4 text-center">
+                {error.user_goal_type}
+            </p>
+            )}
           <select
             className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={bodyData.goalType}
-            onChange={(e) => setBodyData({ ...bodyData, goalType: e.target.value })}
-            required
+            value={bodyData.user_goal_type}
+            onChange={(e) => setBodyData({ ...bodyData, user_goal_type: e.target.value })}
           >
             <option value="" disabled>目標タイプを選択</option>
             <option value="筋肥大">筋肥大</option>
@@ -114,11 +120,15 @@ const BodyMetrics = () => {
         </div>
 
         <div className="mb-4">
+            {error.user_sport_type && (
+                <p className="text-red-400 text-sm mb-4 text-center">
+                {error.user_sport_type}
+            </p>
+            )}
           <select
             className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={bodyData.sportType}
-            onChange={(e) => setBodyData({ ...bodyData, sportType: e.target.value })}
-            required
+            value={bodyData.user_sport_type}
+            onChange={(e) => setBodyData({ ...bodyData, user_sport_type: e.target.value })}
           >
             <option value="" disabled>運動タイプを選択</option>
             <option value="ジム">ジム</option>
@@ -127,17 +137,19 @@ const BodyMetrics = () => {
         </div>
 
         <div className="mb-6">
+            {error.user_target_period && (
+                <p className="text-red-400 text-sm mb-4 text-center">
+                    {error.user_target_period}
+                </p>
+            )}
           <input
             type="text"
             placeholder="目標期間 (例: 3ヶ月)"
-            value={bodyData.tagetPeriod}
-            onChange={(e) => setBodyData({ ...bodyData, tagetPeriod: e.target.value })}
-            required
+            value={bodyData.user_taget_period}
+            onChange={(e) => setBodyData({ ...bodyData,user_taget_period: e.target.value })}
             className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-
-        {errors && <p className="text-red-400 text-sm mb-4 text-center">{errors}</p>}
 
         <button type="submit" className="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold transition">
           登録

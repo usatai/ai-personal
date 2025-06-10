@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useState,useEffect} from "react";
 import Navbar from "@/components/Navbar";
 
 interface Food {
@@ -29,6 +29,24 @@ export default function FoodTracker() {
   const [units, setUnits] = useState<Record<number, "g" | "個">>({});
   const [isSaving, setIsSaving] = useState(false);
   const [searchMessage, setSearchMessage] = useState<string>("");
+  const [datesOfMonth,setDatesOfMonth] = useState<string[]>([]);
+
+    useEffect(() => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1; // getMonth()は0から始まるため+1する
+        const day = today.getDate();
+
+        const datesArray: string[] = [];
+        // 今月の1日から今日までループ
+        for (let i = 1; i <= day; i++) {
+            // YYYY-MM-DD形式にフォーマットする
+            const dateString = `${year}-${String(month).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+            datesArray.push(dateString);
+        }
+
+        setDatesOfMonth(datesArray);
+    }, []); // 空の依存配列[]を指定することで、初回レンダリング時のみ実行される
 
     const searchFood = async () => {
         console.log(query);
@@ -103,8 +121,20 @@ export default function FoodTracker() {
       <h1 className="text-3xl font-bold text-center mt-20 mb-6 drop-shadow">食事記録</h1>
 
       <div className="flex flex-col md:flex-row w-full max-w-6xl gap-6">
+
         {/* 左カラム */}
         <div className="w-full md:w-1/2 bg-slate-800 p-6 rounded-xl shadow-lg">
+
+        <select
+            className="w-full mb-3 p-3 rounded bg-slate-700 border border-slate-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) =>  e.target.value + 'T00:00:00'}
+        >
+        <option value="">登録する日付を選択してください</option>
+        {datesOfMonth.map((date => (
+            <option key={date}>{date}</option>
+        )))}
+        </select>
+
           <label className="block text-sm font-medium mb-2">食事の種類</label>
           <select
             className="w-full p-3 rounded bg-slate-700 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"

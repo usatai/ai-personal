@@ -56,8 +56,6 @@ export default function Main() {
             if (getResponse.ok) {
                 const userInfo = await getResponse.json();
 
-                console.log(userInfo);
-
                 const formatted = userInfo.todayMonth.map((entry: any) => ({
                     ...entry,
                     name: format(new Date(entry.name), 'MM/dd')  // ← ここで日付を整形
