@@ -87,7 +87,7 @@ export default function Main() {
         if (getResponse.ok) {
             const data = await getResponse.json();
             setUserInfo({
-                todayMonth: data.todayMonth,
+                todayMonth: data.todayMonthData,
                 aiAdvice :data.aiAdvice,
             });
         }
@@ -140,6 +140,7 @@ export default function Main() {
               <YAxis stroke="#ccc" />
               <Tooltip />
               <Legend />
+              <Line type="monotone" dataKey="targetWeight" stroke="#ef4444" name="目標体重" />
               <Line type="monotone" dataKey="weight" stroke="#4caf50" name="体重" />
               <Line type="monotone" dataKey="fat" stroke="#ff9800" name="体脂肪" />
             </LineChart>
@@ -154,7 +155,7 @@ export default function Main() {
             <LineChart data={userInfo?.todayMonth}>
               <CartesianGrid strokeDasharray="3 3" stroke="#444" />
               <XAxis dataKey="name" stroke="#ccc" />
-              <YAxis stroke="#ccc" />
+              <YAxis stroke="#ccc" domain={['dataMin - 200', 'dataMax + 200']} />
               <Tooltip />
               <Legend />
               <Line type="monotone" dataKey="caloriesBurned" stroke="#4caf50" name="目標摂取カロリー" />

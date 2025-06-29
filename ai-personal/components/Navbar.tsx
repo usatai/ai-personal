@@ -17,7 +17,7 @@ export default function Navbar() {
             <a href="/main" className="hover:text-blue-400 transition">ダッシュボード</a>
           </li>
           <li>
-            <a href="/body-metrics" className="hover:text-blue-400 transition">目標設定</a>
+            <a href="/body-metrics" className="hover:text-blue-400 transition">AIパーソナル</a>
           </li>
           <li>
             <a href="/food" className="hover:text-blue-400 transition">食事内容入力</a>
@@ -43,7 +43,7 @@ export default function Navbar() {
       {isOpen && (
         <ul className="md:hidden mt-2 space-y-4 bg-slate-800 p-6 rounded-b-xl shadow-md text-sm font-medium">
           <li><a href="/main" className="block hover:text-blue-400">ダッシュボード</a></li>
-          <li><a href="/body-metrics" className="block hover:text-blue-400">目標設定</a></li>
+          <li><a href="/body-metrics" className="block hover:text-blue-400">AIパーソナル</a></li>
           <li><a href="/food" className="block hover:text-blue-400">食事内容入力</a></li>
           <li><a href="/body-management" className="block hover:text-blue-400">進捗記録</a></li>
           <li><a href="/" className="block hover:text-red-400">ログアウト</a></li>
